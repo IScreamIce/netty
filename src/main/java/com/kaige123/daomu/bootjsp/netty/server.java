@@ -14,9 +14,7 @@ public class server {
     private int port = 8081;
 
     public void run() throws Exception {
-        //bossGroup 用来接收进来的连接
         EventLoopGroup bossGroup = new NioEventLoopGroup();
-        //workerGroup 用来处理已经被接收的连接
         EventLoopGroup workerGroup = new NioEventLoopGroup();   //事件环组,连接纽带,在纽带上相互通讯
         try {
             //启动 NIO 服务的辅助启动类
