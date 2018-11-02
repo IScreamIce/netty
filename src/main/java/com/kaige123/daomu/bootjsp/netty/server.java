@@ -17,28 +17,26 @@ public class server {
         //bossGroup 用来接收进来的连接
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         //workerGroup 用来处理已经被接收的连接
-        EventLoopGroup workerGroup = new NioEventLoopGroup();
+        EventLoopGroup workerGroup = new NioEventLoopGroup();   //事件环组,连接纽带,在纽带上相互通讯
         try {
             //启动 NIO 服务的辅助启动类
-            ServerBootstrap b = new ServerBootstrap();
-            b.group(bossGroup, workerGroup)
+            ServerBootstrap b = new ServerBootstrap();      //服务引导
+            b.group(bossGroup, workerGroup)                 //向引导添加纽带
                     .channel(NioServerSocketChannel.class)
-                    .childHandler(new ChannelInitializer<SocketChannel>() {
+                    .childHandler(new ChannelInitializer<SocketChannel>() {     //继承添加请求处理者类
                         @Override
                         public void initChannel(SocketChannel ch) throws Exception {
-                            ch.pipeline().addLast(new serverHandle());
+                            ch.pipeline().addLast(new serverHandle());          //添加处理者
                         }
                     })
-                    .option(ChannelOption.SO_BACKLOG, 128)
-                    .childOption(ChannelOption.SO_KEEPALIVE, true);
-
-            // 服务器绑定端口
-            ChannelFuture f = b.bind(port).sync();
-            // 等待服务器 socket 关闭 。
+                    .option(ChannelOption.SO_BACKLOG, 128)           //最大的连接数
+                    .childOption(ChannelOption.SO_KEEPALIVE, true);  //长时间未心跳,允许发送探测包,探测情况
+            
+            ChannelFuture f = b.bind(port).sync();          // 服务器绑定端口
             f.channel().closeFuture().sync();
         } finally {
             // 出现异常终止
-            workerGroup.shutdownGracefully();
+            workerGroup.shutdownGracefully();               //关闭连接
             bossGroup.shutdownGracefully();
             System.out.println("连接关闭等异常");
         }
