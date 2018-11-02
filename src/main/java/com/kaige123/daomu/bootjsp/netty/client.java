@@ -12,22 +12,22 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 public class client {
 
     public void connect(String host, int port) throws Exception {
-        EventLoopGroup workerGroup = new NioEventLoopGroup();
+        EventLoopGroup workerGroup = new NioEventLoopGroup();       //创建事件环组，创建连接纽带组
 
         try {
-            Bootstrap b = new Bootstrap();
-            b.group(workerGroup);
-            b.channel(NioSocketChannel.class);
-            b.option(ChannelOption.SO_KEEPALIVE, true);
-            b.handler(new ChannelInitializer<SocketChannel>() {
+            Bootstrap b = new Bootstrap();                   //创建服务引导
+            b.group(workerGroup);                            //向服务引导中，添加创建的连接纽带进去
+            b.channel(NioSocketChannel.class);              
+            b.option(ChannelOption.SO_KEEPALIVE, true);      //长时间没有保持心跳，允许发送心跳包
+            b.handler(new ChannelInitializer<SocketChannel>() {     //创建添加处理者内部类类
                 @Override
                 public void initChannel(SocketChannel ch) throws Exception {
-                    ch.pipeline().addLast(new clientHandle());
+                    ch.pipeline().addLast(new clientHandle());      //添加请求处理者
                 }
             });
 
             // 连接发服务器地址
-            ChannelFuture f = b.connect(host, port).sync();
+            ChannelFuture f = b.connect(host, port).sync();         //连接的地址与端口
             // 关闭连接
             f.channel().closeFuture().sync();
         } finally {
